@@ -1,4 +1,3 @@
-import { User } from 'src/modules/users/entities/user.entity';
 import {
   Entity,
   Column,
@@ -7,7 +6,14 @@ import {
   UpdateDateColumn,
   DeleteDateColumn,
   ManyToOne,
+  OneToMany,
 } from 'typeorm';
+
+import { Menu } from 'src/modules/menus/entities/menu.entity';
+import { User } from 'src/modules/users/entities/user.entity';
+import { PubTable } from 'src/modules/pub-tables/entities/pub-table.entity';
+import { Customer } from 'src/modules/customers/entities/customer.entity';
+import { Waiter } from 'src/modules/waiters/entities/waiter.entity';
 
 @Entity('stores')
 export class Store {
@@ -49,6 +55,18 @@ export class Store {
 
   @ManyToOne(() => User, (user) => user.stores)
   user: User;
+
+  @OneToMany(() => Menu, (menu) => menu.store)
+  menus: Menu[];
+
+  @OneToMany(() => PubTable, (pubTable) => pubTable.store)
+  pubTables: PubTable[];
+
+  @OneToMany(() => Customer, (customer) => customer.store)
+  customers: Customer[];
+
+  @OneToMany(() => Waiter, (waiter) => waiter.store)
+  waiters: Waiter[];
 
   @CreateDateColumn({ type: 'timestamp' })
   created_at: Date;
