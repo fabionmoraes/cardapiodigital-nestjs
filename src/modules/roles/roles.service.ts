@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, HttpException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
@@ -25,15 +25,24 @@ export class RolesService {
     return roles;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} role`;
+  async findOne(id: string): Promise<Role> {
+    try {
+      const role = await this.roleRepository.findOneOrFail(id);
+      return role;
+    } catch (err) {
+      throw new HttpException(err.message, 400);
+    }
   }
 
-  update(id: number, updateRoleDto: UpdateRoleDto) {
-    return `This action updates a #${id} role`;
+  update(id: string, updateRoleDto: UpdateRoleDto) {
+    return this.roleRepository.save({
+      id,
+      ...updateRoleDto,
+    });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} role`;
+  async remove(id: string) {
+    const role = await this.roleRepository.findOne(id);
+    return await this.roleRepository.remove(role);
   }
 }
