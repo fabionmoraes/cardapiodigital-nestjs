@@ -22,7 +22,10 @@ export class UsersService {
   }
 
   async getByEmail(email: string) {
-    return await this.userRepository.findOne({ email });
+    return await this.userRepository.findOne({
+      where: { email },
+      relations: ['role'],
+    });
   }
 
   findAll() {
