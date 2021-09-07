@@ -24,8 +24,11 @@ export class Menu {
   @Column({ type: 'decimal', precision: 5, scale: 2, default: 0 })
   price: number;
 
-  @Column()
+  @Column({ nullable: true })
   image: string;
+
+  @Column({ nullable: true })
+  qrCode: string;
 
   @ManyToOne(() => Store, (store) => store.menus)
   store: Store;

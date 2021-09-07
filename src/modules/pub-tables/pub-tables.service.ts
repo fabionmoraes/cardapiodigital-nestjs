@@ -1,26 +1,38 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { CreatePubTableDto } from './dto/create-pub-table.dto';
-import { UpdatePubTableDto } from './dto/update-pub-table.dto';
+import { PubTable } from './entities/pub-table.entity';
 
 @Injectable()
 export class PubTablesService {
-  create(createPubTableDto: CreatePubTableDto) {
-    return 'This action adds a new pubTable';
+  constructor(
+    @InjectRepository(PubTable)
+    private readonly pubTableRepository: Repository<PubTable>,
+  ) {}
+
+  async create(createPubTableDto: CreatePubTableDto): Promise<PubTable> {
+    const newPubTable = this.pubTableRepository.create(createPubTableDto);
+
+    return await this.pubTableRepository.save(newPubTable);
   }
 
-  findAll() {
-    return `This action returns all pubTables`;
+  async findAll(): Promise<PubTable[]> {
+    return await this.pubTableRepository.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} pubTable`;
+  async findOne(id: string): Promise<PubTable> {
+    try {
+      const pubTable = await this.pubTableRepository.findOneOrFail(id);
+
+      return pubTable;
+    } catch (err) {
+      throw new HttpException(err.message, 400);
+    }
   }
 
-  update(id: number, updatePubTableDto: UpdatePubTableDto) {
-    return `This action updates a #${id} pubTable`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} pubTable`;
+  async remove(id: string) {
+    const pubTable = await this.findOne(id);
+    return await this.pubTableRepository.remove(pubTable);
   }
 }
