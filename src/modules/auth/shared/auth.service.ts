@@ -29,7 +29,7 @@ export class AuthService {
     const payload = {
       email: user.email,
       name: user.name,
-      role: user.role.name,
+      role: user.role.slug,
       sub: user.id,
     };
     return {

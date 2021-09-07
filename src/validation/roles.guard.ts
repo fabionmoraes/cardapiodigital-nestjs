@@ -3,6 +3,7 @@ import {
   CanActivate,
   ExecutionContext,
   HttpException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import jwt_decode from 'jwt-decode';
 import { Reflector } from '@nestjs/core';
@@ -19,6 +20,12 @@ export class RolesGuard implements CanActivate {
     }
     // const contractTypesRepository = getRepository(User)
     const request = context.switchToHttp().getRequest();
+    const authorization = request.headers.authorization;
+
+    if (!authorization) {
+      throw new UnauthorizedException();
+    }
+
     const token: any = jwt_decode(request.headers.authorization);
 
     if (roles.includes(token.role)) {

@@ -38,6 +38,15 @@ export class Store {
   @Column({ nullable: false })
   address: string;
 
+  @Column()
+  address_number: number;
+
+  @Column()
+  address_complement: string;
+
+  @Column()
+  neighborhood: string;
+
   @Column({ nullable: false })
   state: string;
 

@@ -10,8 +10,19 @@ export class CreateStoreDto {
   @IsNotEmpty()
   company: string;
 
+  company_name?: string;
+  zip_code?: string;
+
   @IsNotEmpty()
   address: string;
+
+  @IsNotEmpty()
+  address_number: number;
+
+  address_complement: string;
+
+  @IsNotEmpty()
+  neighborhood: string;
 
   @IsNotEmpty()
   state: string;
@@ -19,5 +30,7 @@ export class CreateStoreDto {
   @IsNotEmpty()
   city: string;
 
+  phone?: string;
+  email?: string;
   active?: boolean;
 }
