@@ -6,9 +6,11 @@ import {
   UpdateDateColumn,
   DeleteDateColumn,
   ManyToOne,
+  OneToMany,
 } from 'typeorm';
 
 import { Store } from 'src/modules/stores/entities/store.entity';
+import { PubTable } from 'src/modules/pub-tables/entities/pub-table.entity';
 
 @Entity('waiters')
 export class Waiter {
@@ -26,6 +28,9 @@ export class Waiter {
 
   @ManyToOne(() => Store, (store) => store.waiters)
   store: Store;
+
+  @OneToMany(() => PubTable, (pubTable) => pubTable.waiter)
+  tables: PubTable[];
 
   @CreateDateColumn({ type: 'timestamp' })
   created_at: Date;

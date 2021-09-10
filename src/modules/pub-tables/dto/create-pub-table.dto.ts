@@ -2,7 +2,7 @@ import { IsNotEmpty } from 'class-validator';
 
 export class CreatePubTableDto {
   @IsNotEmpty()
-  number: number;
+  numbers: number[];
 
   @IsNotEmpty()
   storeId: string;

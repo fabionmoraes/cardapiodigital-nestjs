@@ -1,6 +1,8 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { Store } from '../stores/entities/store.entity';
+import { User } from '../users/entities/user.entity';
 import { CreatePubTableDto } from './dto/create-pub-table.dto';
 import { PubTable } from './entities/pub-table.entity';
 
@@ -11,19 +13,43 @@ export class PubTablesService {
     private readonly pubTableRepository: Repository<PubTable>,
   ) {}
 
-  async create(createPubTableDto: CreatePubTableDto): Promise<PubTable> {
-    const newPubTable = this.pubTableRepository.create(createPubTableDto);
+  async create(
+    createPubTableDto: CreatePubTableDto,
+    store: Store,
+  ): Promise<PubTable[]> {
+    const newPubTable = [];
+
+    createPubTableDto.numbers.forEach((item) => {
+      newPubTable.push(
+        this.pubTableRepository.create({
+          number: item,
+          store,
+        }),
+      );
+    });
 
     return await this.pubTableRepository.save(newPubTable);
   }
 
-  async findAll(): Promise<PubTable[]> {
-    return await this.pubTableRepository.find();
+  async findAll(user: User): Promise<PubTable[]> {
+    if (user.role.slug === 'admin') {
+      return await this.pubTableRepository.find({
+        relations: ['waiter', 'store'],
+      });
+    }
+
+    return await this.pubTableRepository.find({
+      where: { store: user.stores[0] },
+      relations: ['waiter', 'store'],
+    });
   }
 
   async findOne(id: string): Promise<PubTable> {
     try {
-      const pubTable = await this.pubTableRepository.findOneOrFail(id);
+      const pubTable = await this.pubTableRepository.findOneOrFail({
+        where: { id },
+        relations: ['waiter', 'store'],
+      });
 
       return pubTable;
     } catch (err) {

@@ -1,5 +1,6 @@
 import { Customer } from 'src/modules/customers/entities/customer.entity';
 import { Store } from 'src/modules/stores/entities/store.entity';
+import { Waiter } from 'src/modules/waiters/entities/waiter.entity';
 import {
   Entity,
   Column,
@@ -27,6 +28,9 @@ export class PubTable {
 
   @ManyToOne(() => Store, (store) => store.menus)
   store: Store;
+
+  @ManyToOne(() => Waiter, (waiter) => waiter.tables)
+  waiter: Waiter;
 
   @OneToMany(() => Customer, (customer) => customer.pubTable)
   customers: Customer[];

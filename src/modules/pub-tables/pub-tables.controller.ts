@@ -5,28 +5,34 @@ import {
   Body,
   Param,
   Delete,
+  Request,
   UseGuards,
 } from '@nestjs/common';
 import { PubTablesService } from './pub-tables.service';
 import { CreatePubTableDto } from './dto/create-pub-table.dto';
 import { JwtAuthGuard } from '../auth/shared/jwt-auth.guard';
 import { Roles } from 'src/validation/roles.decorator';
+import { StoresService } from '../stores/stores.service';
 
 @UseGuards(JwtAuthGuard)
 @Controller('pub-tables')
 export class PubTablesController {
-  constructor(private readonly pubTablesService: PubTablesService) {}
+  constructor(
+    private readonly pubTablesService: PubTablesService,
+    private readonly storesService: StoresService,
+  ) {}
 
   @Post()
   @Roles('users', 'admin')
-  create(@Body() createPubTableDto: CreatePubTableDto) {
-    return this.pubTablesService.create(createPubTableDto);
+  async create(@Body() createPubTableDto: CreatePubTableDto) {
+    const store = await this.storesService.findOne(createPubTableDto.storeId);
+    return this.pubTablesService.create(createPubTableDto, store);
   }
 
   @Get()
   @Roles('users', 'admin')
-  findAll() {
-    return this.pubTablesService.findAll();
+  findAll(@Request() request) {
+    return this.pubTablesService.findAll(request.user);
   }
 
   @Get(':id')

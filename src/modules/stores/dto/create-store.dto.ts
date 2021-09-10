@@ -32,5 +32,6 @@ export class CreateStoreDto {
 
   phone?: string;
   email?: string;
+  userId?: string;
   active?: boolean;
 }

@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   UseGuards,
+  Request,
 } from '@nestjs/common';
 
 import { Roles } from 'src/validation/roles.decorator';
@@ -14,16 +15,24 @@ import { StoresService } from './stores.service';
 import { CreateStoreDto } from './dto/create-store.dto';
 import { UpdateStoreDto } from './dto/update-store.dto';
 import { JwtAuthGuard } from '../auth/shared/jwt-auth.guard';
+import { UsersService } from '../users/users.service';
 
 @UseGuards(JwtAuthGuard)
 @Controller('stores')
 export class StoresController {
-  constructor(private readonly storesService: StoresService) {}
+  constructor(
+    private readonly storesService: StoresService,
+    private readonly usersService: UsersService,
+  ) {}
 
   @Post()
-  @Roles('admin')
-  create(@Body() createStoreDto: CreateStoreDto) {
-    return this.storesService.create(createStoreDto);
+  @Roles('admin', 'users')
+  async create(@Body() createStoreDto: CreateStoreDto, @Request() request) {
+    const { userId } = createStoreDto;
+
+    const user = await this.usersService.findOne(userId || request.user.id);
+
+    return this.storesService.create(createStoreDto, user);
   }
 
   @Get()

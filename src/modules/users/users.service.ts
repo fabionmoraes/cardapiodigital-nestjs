@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Role } from '../roles/entities/role.entity';
@@ -29,11 +29,21 @@ export class UsersService {
   }
 
   findAll() {
-    return this.userRepository.find();
+    return this.userRepository.find({ relations: ['stores'] });
   }
 
-  findOne(id: string) {
-    return `This action returns a #${id} user`;
+  async findOne(id: string): Promise<User> {
+    try {
+      const user = await this.userRepository.findOneOrFail({
+        where: { id },
+        relations: ['stores', 'role'],
+      });
+
+      delete user.password;
+      return user;
+    } catch (err) {
+      throw new HttpException(err.message, 400);
+    }
   }
 
   update(id: string, updateUserDto: UpdateUserDto) {
