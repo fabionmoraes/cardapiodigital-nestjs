@@ -7,33 +7,41 @@ import {
   Param,
   Delete,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import { WaitersService } from './waiters.service';
-import { CreateWaiterDto } from './dto/create-waiter.dto';
+import { CreateWaiterControllerDto } from './dto/create-waiter-controller.dto';
 import { UpdateWaiterDto } from './dto/update-waiter.dto';
 import { JwtAuthGuard } from '../auth/shared/jwt-auth.guard';
 import { Roles } from 'src/validation/roles.decorator';
+import { StoresService } from '../stores/stores.service';
 
 @UseGuards(JwtAuthGuard)
 @Controller('waiters')
 export class WaitersController {
-  constructor(private readonly waitersService: WaitersService) {}
+  constructor(
+    private readonly waitersService: WaitersService,
+    private readonly storesService: StoresService,
+  ) {}
 
   @Post()
   @Roles('admin', 'users')
-  create(@Body() createWaiterDto: CreateWaiterDto) {
-    return this.waitersService.create(createWaiterDto);
+  async create(@Body() createWaiterDto: CreateWaiterControllerDto) {
+    const { storeId } = createWaiterDto;
+    const store = await this.storesService.findOne(storeId);
+    return this.waitersService.create({ ...createWaiterDto, store });
   }
 
   @Get()
   @Roles('admin', 'users')
-  findAll() {
-    return this.waitersService.findAll();
+  async findAll(@Query() query) {
+    const store = await this.storesService.findOne(query.store);
+    return this.waitersService.findAll(store);
   }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.waitersService.findOne(+id);
+    return this.waitersService.findOne(id);
   }
 
   @Patch(':id')

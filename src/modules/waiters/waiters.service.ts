@@ -1,6 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { Store } from '../stores/entities/store.entity';
 import { CreateWaiterDto } from './dto/create-waiter.dto';
 import { UpdateWaiterDto } from './dto/update-waiter.dto';
 import { Waiter } from './entities/waiter.entity';
@@ -18,12 +19,24 @@ export class WaitersService {
     return await this.waiterRepository.save(newWaiter);
   }
 
-  findAll(): Promise<Waiter[]> {
-    return this.waiterRepository.find();
+  findAll(store: Store): Promise<Waiter[]> {
+    return this.waiterRepository.find({
+      where: { store },
+      relations: ['tables'],
+    });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} waiter`;
+  async findOne(id: string): Promise<Waiter> {
+    try {
+      const waiters = await this.waiterRepository.findOneOrFail({
+        where: { id },
+        relations: ['tables'],
+      });
+
+      return waiters;
+    } catch (err) {
+      throw new HttpException(err.message, 400);
+    }
   }
 
   update(id: number, updateWaiterDto: UpdateWaiterDto) {

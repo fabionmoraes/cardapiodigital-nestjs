@@ -9,6 +9,7 @@ import {
 } from 'typeorm';
 
 import { Store } from 'src/modules/stores/entities/store.entity';
+import { MenuCategory } from './menu-category.entity';
 
 @Entity('menus')
 export class Menu {
@@ -32,6 +33,9 @@ export class Menu {
 
   @ManyToOne(() => Store, (store) => store.menus)
   store: Store;
+
+  @ManyToOne(() => MenuCategory, (menuCategory) => menuCategory.menus)
+  category: MenuCategory;
 
   @CreateDateColumn({ type: 'timestamp' })
   created_at: Date;

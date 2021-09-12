@@ -14,6 +14,7 @@ import { User } from 'src/modules/users/entities/user.entity';
 import { PubTable } from 'src/modules/pub-tables/entities/pub-table.entity';
 import { Customer } from 'src/modules/customers/entities/customer.entity';
 import { Waiter } from 'src/modules/waiters/entities/waiter.entity';
+import { MenuCategory } from 'src/modules/menus/entities/menu-category.entity';
 
 @Entity('stores')
 export class Store {
@@ -76,6 +77,9 @@ export class Store {
 
   @OneToMany(() => Waiter, (waiter) => waiter.store)
   waiters: Waiter[];
+
+  @OneToMany(() => MenuCategory, (menuCategory) => menuCategory.store)
+  category: MenuCategory;
 
   @CreateDateColumn({ type: 'timestamp' })
   created_at: Date;
