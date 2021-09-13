@@ -13,4 +13,7 @@ export class CreateMenuDto {
 
   @IsNotEmpty()
   storeId: string;
+
+  @IsNotEmpty()
+  categoryId: number;
 }
