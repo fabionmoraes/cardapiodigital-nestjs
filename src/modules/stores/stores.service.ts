@@ -19,7 +19,14 @@ export class StoresService {
     return await this.storeRepository.save(newStore);
   }
 
-  async findAll(): Promise<Store[]> {
+  async findAll(user: User): Promise<Store[]> {
+    if (user.role.slug === 'users') {
+      return await this.storeRepository.find({
+        where: { user },
+        relations: ['user', 'pubTables', 'waiters'],
+      });
+    }
+
     return await this.storeRepository.find({
       relations: ['user', 'pubTables', 'waiters'],
     });

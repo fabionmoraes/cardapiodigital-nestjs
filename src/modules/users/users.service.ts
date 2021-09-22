@@ -1,4 +1,8 @@
-import { HttpException, Injectable } from '@nestjs/common';
+import {
+  HttpException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Role } from '../roles/entities/role.entity';
@@ -22,10 +26,17 @@ export class UsersService {
   }
 
   async getByEmail(email: string) {
-    return await this.userRepository.findOne({
-      where: { email },
-      relations: ['role'],
-    });
+    try {
+      const user = await this.userRepository.findOneOrFail({
+        where: { email },
+        relations: ['role'],
+      });
+
+      return user;
+    } catch (err) {
+      throw new UnauthorizedException();
+    }
+    return;
   }
 
   findAll() {

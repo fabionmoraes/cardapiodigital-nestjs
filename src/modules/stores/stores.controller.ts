@@ -36,9 +36,9 @@ export class StoresController {
   }
 
   @Get()
-  @Roles('admin')
-  findAll() {
-    return this.storesService.findAll();
+  @Roles('admin', 'users')
+  findAll(@Request() req) {
+    return this.storesService.findAll(req.user);
   }
 
   @Get(':id')
